@@ -13,7 +13,8 @@ export default defineConfig(({ mode }) => {
       open: true,
       // this sets a default port to 3000
       port: PORT,
-      host: true
+      host: true,
+      allowedHosts: ['.localhost', '.ondigitalocean.app']
     },
     preview: {
       open: true,
