@@ -163,9 +163,13 @@ const LeaveRequestList = () => {
       sortable: false,
       renderCell: (params) => (
         <Box>
-          <Tooltip title={employee ? 'Προβολή' : 'Επεξεργασία'}>
+          <Tooltip title={employee && params.row.leaveStatus === 'Approved' ? 'Προβολή' : 'Επεξεργασία'}>
             <IconButton size="small" onClick={() => navigate(`/management/leave-requests/${params.row.documentId}/edit`)} color="primary">
-              {employee ? <EyeOutlined /> : <EditOutlined />}
+              {employee && (params.row.leaveStatus === 'Approved' || params.row.leaveStatus === 'Declined') ? (
+                <EyeOutlined />
+              ) : (
+                <EditOutlined />
+              )}
             </IconButton>
           </Tooltip>
           <Tooltip title="Διαγραφή">

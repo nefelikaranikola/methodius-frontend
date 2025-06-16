@@ -37,7 +37,7 @@ const EmployeeList = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
 
-  const { token, canAccessManagement } = useAuth();
+  const { token, canAccessManagement, employee } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,8 +58,13 @@ const EmployeeList = () => {
     }
   };
 
-  const handleEdit = (employee) => {
-    navigate(`/management/employees/${employee.documentId}/edit`);
+  const handleEdit = (employeeRow) => {
+    navigate(`/management/employees/${employeeRow.documentId}/edit`);
+  };
+
+  const canEditEmployee = (employeeRow) => {
+    // Admin can edit anyone, employee can only edit themselves
+    return canAccessManagement() || (employee && employee.documentId === employeeRow.documentId);
   };
 
   const handleDeleteConfirm = (employee) => {
@@ -182,11 +187,13 @@ const EmployeeList = () => {
       sortable: false,
       renderCell: (params) => (
         <Box>
-          <Tooltip title="Επεξεργασία">
-            <IconButton size="small" onClick={() => handleEdit(params.row)} color="primary">
-              <EditOutlined />
-            </IconButton>
-          </Tooltip>
+          {canEditEmployee(params.row) && (
+            <Tooltip title="Επεξεργασία">
+              <IconButton size="small" onClick={() => handleEdit(params.row)} color="primary">
+                <EditOutlined />
+              </IconButton>
+            </Tooltip>
+          )}
           {canAccessManagement() && (
             <Tooltip title="Διαγραφή">
               <IconButton size="small" onClick={() => handleDeleteConfirm(params.row)} color="error">

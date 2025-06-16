@@ -47,6 +47,9 @@ const LeaveRequestForm = () => {
   });
   const [errors, setErrors] = useState({});
 
+  // Check if this is a read-only view for approved leave requests by employees
+  const isReadOnly = isEmployee && isEdit && (formData.leaveStatus === 'Approved' || formData.leaveStatus === 'Declined');
+
   useEffect(() => {
     if (!isEmployee) {
       loadEmployees();
@@ -175,7 +178,9 @@ const LeaveRequestForm = () => {
 
   if (loading) {
     return (
-      <MainCard title={isEdit ? 'Επεξεργασία Αιτήματος Άδειας' : 'Προσθήκη Νέου Αιτήματος Άδειας'}>
+      <MainCard
+        title={isEdit ? (isReadOnly ? 'Προβολή Αιτήματος Άδειας' : 'Επεξεργασία Αιτήματος Άδειας') : 'Προσθήκη Νέου Αιτήματος Άδειας'}
+      >
         <Box display="flex" justifyContent="center" p={3}>
           <CircularProgress />
         </Box>
@@ -185,7 +190,7 @@ const LeaveRequestForm = () => {
 
   return (
     <MainCard
-      title={isEdit ? 'Επεξεργασία Αιτήματος Άδειας' : 'Προσθήκη Νέου Αιτήματος Άδειας'}
+      title={isEdit ? (isReadOnly ? 'Προβολή Αιτήματος Άδειας' : 'Επεξεργασία Αιτήματος Άδειας') : 'Προσθήκη Νέου Αιτήματος Άδειας'}
       secondary={
         <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack}>
           Επιστροφή στη Λίστα
@@ -204,7 +209,13 @@ const LeaveRequestForm = () => {
           <Grid item size={{ xs: 12, md: 6 }}>
             <FormControl fullWidth error={!!errors.employee}>
               <InputLabel>Υπάλληλος *</InputLabel>
-              <Select name="employee" value={formData.employee} onChange={handleChange} label="Υπάλληλος *" disabled={isEmployee}>
+              <Select
+                name="employee"
+                value={formData.employee}
+                onChange={handleChange}
+                label="Υπάλληλος *"
+                disabled={isEmployee || isReadOnly}
+              >
                 {isEmployee ? (
                   <MenuItem value={employee.id}>
                     {employee.firstName} {employee.lastName}
@@ -225,7 +236,7 @@ const LeaveRequestForm = () => {
           <Grid item size={{ xs: 12, md: 6 }}>
             <FormControl fullWidth error={!!errors.leaveType}>
               <InputLabel>Τύπος Άδειας *</InputLabel>
-              <Select name="leaveType" value={formData.leaveType} onChange={handleChange} label="Τύπος Άδειας *">
+              <Select name="leaveType" value={formData.leaveType} onChange={handleChange} label="Τύπος Άδειας *" disabled={isReadOnly}>
                 <MenuItem value="Sick Leave">Άδεια Ασθενείας</MenuItem>
                 <MenuItem value="Vacation">Διακοπές</MenuItem>
                 <MenuItem value="Personal Leave">Προσωπική Άδεια</MenuItem>
@@ -245,6 +256,7 @@ const LeaveRequestForm = () => {
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
               required
+              disabled={isReadOnly}
               error={!!errors.startDate}
               helperText={errors.startDate}
             />
@@ -261,6 +273,7 @@ const LeaveRequestForm = () => {
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
               required
+              disabled={isReadOnly}
               error={!!errors.endDate}
               helperText={errors.endDate}
             />
@@ -277,6 +290,7 @@ const LeaveRequestForm = () => {
               onChange={handleChange}
               inputProps={{ min: 0, step: 0.5 }}
               required
+              disabled={isReadOnly}
               error={!!errors.totalHours}
               helperText={errors.totalHours}
             />
@@ -306,6 +320,7 @@ const LeaveRequestForm = () => {
               rows={3}
               value={formData.reason}
               onChange={handleChange}
+              disabled={isReadOnly}
               placeholder="Προαιρετική αιτιολογία για το αίτημα άδειας..."
             />
           </Grid>
@@ -316,9 +331,11 @@ const LeaveRequestForm = () => {
               <Button variant="outlined" onClick={handleBack} disabled={saving}>
                 Άκυρο
               </Button>
-              <Button type="submit" variant="contained" startIcon={<SaveIcon />} disabled={saving}>
-                {saving ? 'Αποθήκευση...' : isEdit ? 'Ενημέρωση Αιτήματος' : 'Δημιουργία Αιτήματος'}
-              </Button>
+              {!isReadOnly && (
+                <Button type="submit" variant="contained" startIcon={<SaveIcon />} disabled={saving}>
+                  {saving ? 'Αποθήκευση...' : isEdit ? 'Ενημέρωση Αιτήματος' : 'Δημιουργία Αιτήματος'}
+                </Button>
+              )}
             </Stack>
           </Grid>
         </Grid>

@@ -53,11 +53,15 @@ const employeeSchema = Yup.object().shape({
 const EmployeeForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, employee, isAdmin } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Check if employee is trying to edit someone else's profile
+  const isEditingOwnProfile = employee && id === employee.documentId;
+  const canEdit = isAdmin() || isEditingOwnProfile;
   const [initialValues, setInitialValues] = useState({
     firstName: '',
     lastName: '',
@@ -84,6 +88,13 @@ const EmployeeForm = () => {
       loadEmployee();
     }
   }, [id]);
+
+  // Redirect if employee is trying to edit someone else's profile
+  useEffect(() => {
+    if (isEditing && employee && !canEdit) {
+      navigate('/management/employees');
+    }
+  }, [isEditing, employee, canEdit, navigate]);
 
   const loadEmployee = async () => {
     try {
