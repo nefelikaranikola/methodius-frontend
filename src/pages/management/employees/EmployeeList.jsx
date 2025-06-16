@@ -71,7 +71,7 @@ const EmployeeList = () => {
     if (!employeeToDelete) return;
 
     try {
-      await deleteEmployee(token, employeeToDelete.documentId);
+      await deleteEmployee(employeeToDelete.documentId, token);
       setEmployees(employees.filter((emp) => emp.documentId !== employeeToDelete.documentId));
       setDeleteDialogOpen(false);
       setEmployeeToDelete(null);
